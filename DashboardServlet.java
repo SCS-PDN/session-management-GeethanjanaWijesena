@@ -5,12 +5,28 @@ import javax.servlet.http.*;
 
 @WebServlet("/DashboardServlet")
 public class DashboardServlet extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // TODO: Implement dashboard logic
-        // 1. Check if user is logged in (session)
-        // 2. Create a list of courses (hardcoded)
-        // 3. Store courses in request attribute
-        // 4. Forward to dashboard.jsp
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("username") == null) {
+            response.sendRedirect("login.html");
+            return;
+        }
+
+        List<Course> courses = List.of(
+            new Course("101", "Math", "Dr. Sumith"),
+            new Course("102", "Physics", "Dr. Malsha"),
+            new Course("103", "Chemistry", "Dr. Sewmi")
+        );
+
+        request.setAttribute("courses", courses);
+
+        List<Course> enrolled = (List<Course>) session.getAttribute("enrolled");
+        if (enrolled == null) {
+            enrolled = new ArrayList<>();
+        }
+        request.setAttribute("enrolled", enrolled);
+
+        request.getRequestDispatcher("dashboard.jsp").forward(request, response);
     }
 }
